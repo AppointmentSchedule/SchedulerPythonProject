@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Pending</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .message-box {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+        .message-box h1 {
+            color: #007bff;
+        }
+        .message-box p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="message-box">
+        <h1>Appointment Pending</h1>
+        <p>Your appointment is pending. Once approved by {{ hospital }}, you will receive a confirmation email.</p>
+    </div>
+</body>
+</html>

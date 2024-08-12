@@ -1,0 +1,22 @@
+#NOT IN USE
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Confirmation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Appointment Confirmation</h1>
+    <p>Thank you, {{ appointment.name }}. Your appointment has been scheduled.</p>
+    <p>Details:</p>
+    <ul>
+        <li>Hospital: {{ appointment.hospital }}</li>
+        <li>Time Slot: {{ appointment.time_slot }}</li>
+        <li>Email: {{ appointment.email }}</li>
+        <li>Date Scheduled: {{ appointment.date }}</li>
+    </ul>
+</body>
+</html>

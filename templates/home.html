@@ -1,0 +1,585 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Find Appointment</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Find the next available appointment near you</h1>#}
+{#    <div>#}
+{#        <form id="appointment-form" action="{{ url_for('search') }}" method="post">#}
+{#            <input type="text" name="appointment_type" placeholder="Appointment Type">#}
+{#            <input type="text" name="city_province" placeholder="City, Province">#}
+{#            <input type="text" name="priority_number" placeholder="Priority Number">#}
+{#            <button type="submit">#}
+{#                <img src="{{ url_for('static', filename='search-icon.png') }}" alt="Search">#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
+{#    <div>#}
+{#        <p>Please scan your requisition below</p>#}
+{#        <div id="upload-section">#}
+{#            <div id="drag-drop-area">#}
+{#                <p>Drag&Drop files here</p>#}
+{#                <p>or</p>#}
+{#                <button id="browse-files-button">Browse Files</button>#}
+{#            </div>#}
+{#            <div id="scan-document-section">#}
+{#                <form action="{{ url_for('scan_document') }}" method="post">#}
+{#                    <button type="submit">Scan Document</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</body>#}
+{#</html>#}
+
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Find Appointment</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Find the next available appointment near you</h1>#}
+{#    <div>#}
+{#        <form id="appointment-form" action="{{ url_for('search') }}" method="post">#}
+{#            <input type="text" name="appointment_type" placeholder="Appointment Type">#}
+{#            <input type="text" name="city_province" placeholder="City, Province">#}
+{#            <input type="text" name="priority_number" placeholder="Priority Number">#}
+{#            <button type="submit">#}
+{#                <img src="{{ url_for('static', filename='search-icon.png') }}" alt="Search">#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
+{#    <div>#}
+{#        <p>Please scan your requisition below</p>#}
+{#        <div id="upload-section">#}
+{#            <div id="drag-drop-area">#}
+{#                <p>Drag&Drop files here</p>#}
+{#                <p>or</p>#}
+{#                <button id="browse-files-button">Browse Files</button>#}
+{#            </div>#}
+{#            <div id="scan-document-section">#}
+{#                <form action="{{ url_for('scan_document') }}" method="post">#}
+{#                    <button type="submit">Scan Document</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</body>#}
+{#</html>#}
+
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Find Appointment</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Find the next available appointment near you</h1>#}
+{#    <div>#}
+{#        <form id="appointment-form" action="{{ url_for('search') }}" method="post">#}
+{#            <input type="text" name="appointment_type" placeholder="Appointment Type">#}
+{#            <input type="text" name="city_province" placeholder="City, Province">#}
+{#            <input type="text" name="priority_number" placeholder="Priority Number">#}
+{#            <button type="submit">#}
+{#                <img src="{{ url_for('static', filename='search-icon.png') }}" alt="Search">#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
+{#    <div>#}
+{#        <p>Please scan your requisition below</p>#}
+{#        <div id="upload-section">#}
+{#            <div id="drag-drop-area">#}
+{#                <p>Drag & Drop files here</p>#}
+{#                <p>or</p>#}
+{#                <form id="file-upload-form" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">#}
+{#                    <input type="file" name="file" id="file-input">#}
+{#                    <button type="submit">Upload File</button>#}
+{#                </form>#}
+{#            </div>#}
+{#            <div id="scan-document-section">#}
+{#                <form action="{{ url_for('scan_document') }}" method="post">#}
+{#                    <button type="submit">Scan Document</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</body>#}
+{#</html>#}
+
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Find Appointment</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#    <style>#}
+{#        #file-preview {#}
+{#            margin-top: 10px;#}
+{#        }#}
+{#        #file-preview img {#}
+{#            max-width: 100%;#}
+{#            max-height: 300px;#}
+{#        }#}
+{#    </style>#}
+{#    <script>#}
+{#        function previewFile() {#}
+{#            const fileInput = document.getElementById('file-input');#}
+{#            const file = fileInput.files[0];#}
+{#            const preview = document.getElementById('file-preview');#}
+{#            const reader = new FileReader();#}
+{##}
+{#            // Clear previous preview#}
+{#            preview.innerHTML = '';#}
+{##}
+{#            if (file) {#}
+{#                const img = document.createElement('img');#}
+{#                img.file = file;#}
+{#                preview.appendChild(img);#}
+{##}
+{#                reader.onload = function(e) {#}
+{#                    img.src = e.target.result;#}
+{#                }#}
+{##}
+{#                reader.readAsDataURL(file);#}
+{#            }#}
+{#        }#}
+{##}
+{#        function uploadFile(event) {#}
+{#            event.preventDefault();#}
+{#            var formData = new FormData(document.getElementById('upload-form'));#}
+{#            fetch('{{ url_for('upload_file') }}', {#}
+{#                method: 'POST',#}
+{#                body: formData#}
+{#            })#}
+{#            .then(response => response.json())#}
+{#            .then(data => {#}
+{#                if (data.error) {#}
+{#                    alert(`Error: ${data.error}`);#}
+{#                } else {#}
+{#                    alert(data.message);#}
+{#                }#}
+{#            })#}
+{#            .catch(error => {#}
+{#                console.error('Error:', error);#}
+{#            });#}
+{#        }#}
+{#    </script>#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Find the next available appointment near you</h1>#}
+{#    <div>#}
+{#        <form id="appointment-form" action="{{ url_for('search') }}" method="post">#}
+{#            <input type="text" name="appointment_type" placeholder="Appointment Type">#}
+{#            <input type="text" name="city_province" placeholder="City, Province">#}
+{#            <input type="text" name="priority_number" placeholder="Priority Number">#}
+{#            <button type="submit">#}
+{#                <img src="{{ url_for('static', filename='search-icon.png') }}" alt="Search">#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
+{#    <div>#}
+{#        <p>Please scan your requisition below</p>#}
+{#                <button id="browse-files-button" onclick="document.getElementById('file-input').click();">Browse Files</button>#}
+{#                <form id="upload-form" onsubmit="uploadFile(event)">#}
+{#                    <input type="file" id="file-input" name="file" style="display:none" onchange="previewFile()">#}
+{#                    <button type="submit">Upload File</button>#}
+{#                </form>#}
+{#                <div id="file-preview"></div>#}
+{#            </div>#}
+{#            <div id="scan-document-section">#}
+{#                <form action="{{ url_for('scan_document') }}" method="post">#}
+{#                    <button type="submit">Scan Document</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</body>#}
+{#</html>#}
+
+{##}
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Find Appointment</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#    <style>#}
+{#        #file-preview {#}
+{#            margin-top: 10px;#}
+{#        }#}
+{#        #file-preview img {#}
+{#            max-width: 100%;#}
+{#            max-height: 300px;#}
+{#        }#}
+{#    </style>#}
+{#    <script>#}
+{#        function previewFile() {#}
+{#            const fileInput = document.getElementById('file-input');#}
+{#            const file = fileInput.files[0];#}
+{#            const preview = document.getElementById('file-preview');#}
+{#            const reader = new FileReader();#}
+{##}
+{#            // Clear previous preview#}
+{#            preview.innerHTML = '';#}
+{##}
+{#            if (file) {#}
+{#                const img = document.createElement('img');#}
+{#                img.file = file;#}
+{#                preview.appendChild(img);#}
+{##}
+{#                reader.onload = function(e) {#}
+{#                    img.src = e.target.result;#}
+{#                }#}
+{##}
+{#                reader.readAsDataURL(file);#}
+{#            }#}
+{#        }#}
+{##}
+{#        function uploadFile(event) {#}
+{#            event.preventDefault();#}
+{#            var formData = new FormData(document.getElementById('upload-form'));#}
+{#            fetch('{{ url_for('upload_file') }}', {#}
+{#                method: 'POST',#}
+{#                body: formData#}
+{#            })#}
+{#            .then(response => response.json())#}
+{#            .then(data => {#}
+{#                if (data.error) {#}
+{#                    alert(`Error: ${data.error}`);#}
+{#                } else {#}
+{#                    alert(data.message);#}
+{#                    // Populate the form fields with extracted information#}
+{#                    document.getElementsByName('appointment_type')[0].value = data.appointment_type || '';#}
+{#                    document.getElementsByName('city_province')[0].value = data.city_province || '';#}
+{#                    document.getElementsByName('priority_number')[0].value = data.priority_number || '';#}
+{#                }#}
+{#            })#}
+{#            .catch(error => {#}
+{#                console.error('Error:', error);#}
+{#            });#}
+{#        }#}
+{#    </script>#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Find the next available appointment near you</h1>#}
+{#    <div>#}
+{#        <form id="appointment-form" action="{{ url_for('search') }}" method="post">#}
+{#            <input type="text" name="appointment_type" placeholder="Appointment Type">#}
+{#            <input type="text" name="city_province" placeholder="City, Province">#}
+{#            <input type="text" name="priority_number" placeholder="Priority Number">#}
+{#            <button type="submit">#}
+{#                <img src="{{ url_for('static', filename='search-icon.png') }}" alt="Search">#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
+{#    <div>#}
+{#        <p>Please scan your requisition below</p>#}
+{#        <div id="upload-section">#}
+{#            <div id="drag-drop-area">#}
+{#                <p>Drag&Drop files here</p>#}
+{#                <p>or</p>#}
+{#                <button id="browse-files-button" type="button" onclick="document.getElementById('file-input').click();">Browse Files</button>#}
+{#                <form id="upload-form" onsubmit="uploadFile(event)">#}
+{#                    <input type="file" id="file-input" name="file" style="display:none" onchange="previewFile()">#}
+{#                    <button type="submit">Upload File</button>#}
+{#                </form>#}
+{#                <div id="file-preview"></div>#}
+{#            </div>#}
+{#            <div id="scan-document-section">#}
+{#                <form action="{{ url_for('scan_document') }}" method="post">#}
+{#                    <button type="submit">Scan Document</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</body>#}
+{#</html>#}
+{##}
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Find Appointment</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#    <style>#}
+{#        #file-preview {#}
+{#            margin-top: 10px;#}
+{#        }#}
+{#        #file-preview img {#}
+{#            max-width: 100%;#}
+{#            max-height: 300px;#}
+{#        }#}
+{#    </style>#}
+{#    <script>#}
+{#        function previewFile() {#}
+{#            const fileInput = document.getElementById('file-input');#}
+{#            const file = fileInput.files[0];#}
+{#            const preview = document.getElementById('file-preview');#}
+{#            const reader = new FileReader();#}
+{##}
+{#            // Clear previous preview#}
+{#            preview.innerHTML = '';#}
+{##}
+{#            if (file) {#}
+{#                const img = document.createElement('img');#}
+{#                img.file = file;#}
+{#                preview.appendChild(img);#}
+{##}
+{#                reader.onload = function(e) {#}
+{#                    img.src = e.target.result;#}
+{#                }#}
+{##}
+{#                reader.readAsDataURL(file);#}
+{#            }#}
+{#        }#}
+{##}
+{#        function uploadFile(event) {#}
+{#            event.preventDefault();#}
+{#            var formData = new FormData(document.getElementById('upload-form'));#}
+{#            fetch('{{ url_for('upload_file') }}', {#}
+{#                method: 'POST',#}
+{#                body: formData#}
+{#            })#}
+{#            .then(response => response.json())#}
+{#            .then(data => {#}
+{#                if (data.error) {#}
+{#                    alert(`Error: ${data.error}`);#}
+{#                } else {#}
+{#                    alert(data.message);#}
+{#                    // Populate the form fields with extracted information#}
+{#                    document.getElementsByName('appointment_type')[0].value = data.appointment_type || '';#}
+{#                    document.getElementsByName('city_province')[0].value = data.city_province || '';#}
+{#                    document.getElementsByName('priority_number')[0].value = data.priority_number || '';#}
+{#                }#}
+{#            })#}
+{#            .catch(error => {#}
+{#                console.error('Error:', error);#}
+{#            });#}
+{#        }#}
+{#    </script>#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Find the next available appointment near you</h1>#}
+{#    <div>#}
+{#        <form id="appointment-form" action="{{ url_for('search') }}" method="post">#}
+{#            <input type="text" name="appointment_type" placeholder="Appointment Type">#}
+{#            <input type="text" name="city_province" placeholder="City, Province">#}
+{#            <input type="text" name="priority_number" placeholder="Priority Number">#}
+{#            <button type="submit">#}
+{#                <img src="{{ url_for('static', filename='search-icon.png') }}" alt="Search">#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
+{#    <div>#}
+{#        <p>Please scan your requisition below</p>#}
+{#        <div id="upload-section">#}
+{#            <div id="drag-drop-area">#}
+{#                <p>Drag&Drop files here</p>#}
+{#                <p>or</p>#}
+{#                <button id="browse-files-button" type="button" onclick="document.getElementById('file-input').click();">Browse Files</button>#}
+{#                <form id="upload-form" onsubmit="uploadFile(event)">#}
+{#                    <input type="file" id="file-input" name="file" style="display:none" onchange="previewFile()">#}
+{#                    <button type="submit">Upload File</button>#}
+{#                </form>#}
+{#                <div id="file-preview"></div>#}
+{#            </div>#}
+{#            <div id="scan-document-section">#}
+{#                <form action="{{ url_for('scan_document') }}" method="post">#}
+{#                    <button type="submit">Scan Document</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</body>#}
+{#</html>#}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Appointment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 24px;
+            color: #007bff;
+        }
+        #appointment-form {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        #appointment-form input {
+            margin: 0 5px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            width: 200px;
+        }
+        #appointment-form button {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #appointment-form button img {
+            width: 20px;
+            height: 20px;
+        }
+        #upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+        }
+        #drag-drop-area {
+            border: 2px dashed #ced4da;
+            border-radius: 4px;
+            width: 60%;
+            padding: 40px;
+            text-align: center;
+            background-color: #ffffff;
+        }
+        #drag-drop-area p {
+            margin: 10px 0;
+            color: #6c757d;
+        }
+        #browse-files-button {
+            background-color: #007bff;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #upload-form button {
+            background-color: #28a745;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        #file-preview {
+            margin-top: 20px;
+        }
+        #file-preview img {
+            max-width: 100%;
+            max-height: 300px;
+        }
+        #scan-document-button {
+            background-color: #17a2b8;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function previewFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            const preview = document.getElementById('file-preview');
+            const reader = new FileReader();
+
+            preview.innerHTML = '';
+
+            if (file) {
+                const img = document.createElement('img');
+                img.file = file;
+                preview.appendChild(img);
+
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadFile(event) {
+            event.preventDefault();
+            var formData = new FormData(document.getElementById('upload-form'));
+            fetch('{{ url_for('upload_file') }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                } else {
+                    alert(data.message);
+                    document.getElementsByName('appointment_type')[0].value = data.appointment_type || '';
+                    document.getElementsByName('city_province')[0].value = data.city_province || '';
+                    document.getElementsByName('priority_number')[0].value = data.priority_number || '';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Find the next available appointment near you</h1>
+    <div>
+        <form id="appointment-form" action="{{ url_for('search') }}" method="post">
+            <input type="text" name="appointment_type" placeholder="Appointment Type">
+            <input type="text" name="city_province" placeholder="City, Province">
+            <input type="text" name="priority_number" placeholder="Priority Number">
+            <button type="submit">
+                <img src="{{ url_for('static', filename='search-icon.png') }}" alt="Search">
+            </button>
+        </form>
+    </div>
+    <div>
+{#        <p style="text-align: center; margin-top: 30px;">Please scan your requisition below</p>#}
+{#        <div id="upload-section">#}
+{#            <div id="drag-drop-area">#}
+{#                <p>Drag&Drop files here</p>#}
+{#                <p>or</p>#}
+{#                <button id="browse-files-button" type="button" onclick="document.getElementById('file-input').click();">Browse Files</button>#}
+{#                <form id="upload-form" onsubmit="uploadFile(event)">#}
+{#                    <input type="file" id="file-input" name="file" style="display:none" onchange="previewFile()">#}
+{#                    <button type="submit">Upload File</button>#}
+{#                </form>#}
+{#                <div id="file-preview"></div>#}
+{#            </div>#}
+{#            <div id="scan-document-section">#}
+{#                <form action="{{ url_for('scan_document') }}" method="post">#}
+{#                    <button id="scan-document-button" type="submit">Scan Document</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+</body>
+</html>
+
+

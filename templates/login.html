@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        .login-box {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+        }
+        .login-box h2 {
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .login-box button {
+            display: block;
+            width: 200px;
+            padding: 15px;
+            margin: 20px auto;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .login-box button:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .header {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            color: #66bfbf;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+        .subheader {
+            color: #fff;
+            margin-top: 10px;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop class="video-bg">
+        <source src="{{ url_for('static', filename='Screen Recording 2024-07-24 at 10.23.38 AM.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="header">
+            Welcome to Appointlet.
+        </div>
+        <div class="subheader">
+            Effortless Scheduling, Seamless Connections
+        </div>
+        <div class="login-box">
+            <h2>I am a...</h2>
+            <button onclick="window.location.href='/home'">Patient</button>
+            <button onclick="window.location.href='/clinician_login'">Clinician</button>
+        </div>
+    </div>
+</body>
+</html>

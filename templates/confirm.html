@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Appointment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 24px;
+            color: #007bff;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin: 40px;
+        }
+        .form-container, .upload-container {
+            width: 45%;
+        }
+        .form-container form, .upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .form-container form input, .form-container form button {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .form-container form button {
+            background-color: #007bff;
+            cursor: pointer;
+            color: #ffffff;
+        }
+        #upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #drag-drop-area {
+            border: 2px dashed #ced4da;
+            border-radius: 4px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            background-color: #ffffff;
+        }
+        #drag-drop-area p {
+            margin: 10px 0;
+            color: #6c757d;
+        }
+        #browse-files-button {
+            background-color: #007bff;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #upload-form button {
+            background-color: #28a745;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        #file-preview {
+            margin-top: 20px;
+        }
+        #file-preview img {
+            max-width: 100%;
+            max-height: 300px;
+        }
+        #scan-document-button {
+            background-color: #17a2b8;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        let fileUploaded = false;
+
+        function previewFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            const preview = document.getElementById('file-preview');
+            const reader = new FileReader();
+
+            preview.innerHTML = '';
+
+            if (file) {
+                fileUploaded = true;
+                const img = document.createElement('img');
+                img.file = file;
+                preview.appendChild(img);
+
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadFile(event) {
+            event.preventDefault();
+            var formData = new FormData(document.getElementById('upload-form'));
+            fetch('{{ url_for('upload_file') }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function confirmAppointment(event) {
+            if (!fileUploaded) {
+                event.preventDefault();
+                alert('Please upload requisition to finish booking');
+            } else {
+                const form = document.querySelector('form');
+                form.action = "{{ url_for('appointment_pending') }}";
+                form.submit();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('form').addEventListener('submit', confirmAppointment);
+        });
+    </script>
+</head>
+<body>
+    <h1>Confirm Your Appointment</h1>
+    <div class="container">
+        <div class="form-container">
+            <form method="post">
+                <p>Date: {{ location }}</p>
+                <p>Timeslot: {{ slot }}</p>
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <label for="healthcare_number">Healthcare number:</label>
+                <input type="text" id="healthcare_number" name="healthcare_number" required>
+                <button type="submit">Confirm</button>
+            </form>
+        </div>
+        <div class="upload-container">
+            <p>Upload requisition to finish booking</p>
+            <div id="upload-section">
+                <div id="drag-drop-area">
+                    <p>Drag & Drop files here</p>
+                    <p>or</p>
+                    <button id="browse-files-button" type="button" onclick="document.getElementById('file-input').click();">Browse Files</button>
+                    <form id="upload-form" onsubmit="uploadFile(event)">
+                        <input type="file" id="file-input" name="file" style="display:none" onchange="previewFile()">
+                        <button type="submit">Upload File</button>
+                    </form>
+                    <div id="file-preview"></div>
+                </div>
+                <div id="scan-document-section">
+                    <form action="{{ url_for('scan_document') }}" method="post">
+                        <button id="scan-document-button" type="submit">Scan Document</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

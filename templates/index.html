@@ -1,0 +1,155 @@
+{#<!-- templates/index.html -->#}
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Appointment Booking</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Showing available appointments near you</h1>#}
+{#    <a href="{{ url_for('home') }}">Back to Home</a>#}
+{#    <form action="{{ url_for('search') }}" method="post">#}
+{#        <input type="text" name="address" placeholder="Enter your address">#}
+{#        <button type="submit">Search</button>#}
+{#    </form>#}
+{#    {% for appointment in appointments %}#}
+{#        <div class="appointment">#}
+{#            <h2>{{ appointment.location }}</h2>#}
+{#            <p>{{ appointment.address }}</p>#}
+{#            <form action="{{ url_for('confirm') }}" method="post">#}
+{#                {% for slot in appointment.slots %}#}
+{#                    <input type="radio" name="slot" value="{{ slot }}" required> {{ slot }}<br>#}
+{#                {% endfor %}#}
+{#                <input type="hidden" name="location" value="{{ appointment.location }}">#}
+{#                <button type="submit">Schedule Appointment</button>#}
+{#            </form>#}
+{#        </div>#}
+{#    {% endfor %}#}
+{#</body>#}
+{#</html>#}
+{##}
+
+
+{##}
+{##}
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Appointment Booking</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Showing available appointments near you</h1>#}
+{#    <a href="{{ url_for('home') }}">Back to Home</a>#}
+{#    <form action="{{ url_for('search') }}" method="post">#}
+{#        <input type="text" name="address" placeholder="Enter your address">#}
+{#        <button type="submit">Find Location</button>#}
+{#    </form>#}
+{#    {% for appointment in appointments %}#}
+{#        <div class="appointment">#}
+{#            <h2>{{ appointment.location }}</h2>#}
+{#            <p>{{ appointment.address }}</p>#}
+{#            <form action="{{ url_for('confirm') }}" method="post">#}
+{#                {% for slot in appointment.slots %}#}
+{#                    <input type="radio" name="slot" value="{{ slot }}" required> {{ slot }}<br>#}
+{#                {% endfor %}#}
+{#                <input type="hidden" name="location" value="{{ appointment.location }}">#}
+{#                <button type="submit">Schedule Appointment</button>#}
+{#            </form>#}
+{#        </div>#}
+{#    {% endfor %}#}
+{#</body>#}
+{#</html>#}
+
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>Appointment Booking</title>#}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+{#</head>#}
+{#<body>#}
+{#    <h1>Showing available appointments near you</h1>#}
+{#    <a href="{{ url_for('home') }}">Back to Home</a>#}
+{#    <form action="{{ url_for('search') }}" method="post">#}
+{#        <input type="text" name="address" placeholder="Enter your address">#}
+{#        <button type="submit">Find Location</button>#}
+{#    </form>#}
+{#    {% if error %}#}
+{#        <p>{{ error }}</p>#}
+{#    {% endif %}#}
+{#    {% for appointment in appointments %}#}
+{#        <div class="appointment">#}
+{#            <h2>{{ appointment.location }}</h2>#}
+{#            <p>{{ appointment.address }}</p>#}
+{#            <form action="{{ url_for('confirm') }}" method="post">#}
+{#                {% for slot in appointment.slots %}#}
+{#                    <input type="radio" name="slot" value="{{ slot }}" required> {{ slot }}<br>#}
+{#                {% endfor %}#}
+{#                <input type="hidden" name="location" value="{{ appointment.location }}">#}
+{#                <button type="submit">Schedule Appointment</button>#}
+{#            </form>#}
+{#        </div>#}
+{#    {% endfor %}#}
+{#</body>#}
+{#</html>#}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Showing available appointments near you</h1>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+    <form action="{{ url_for('search') }}" method="post">
+        <input type="text" name="appointment_type" placeholder="Appointment Type">
+        <input type="text" name="city_province" placeholder="City, Province">
+        <input type="text" name="priority_number" placeholder="Priority Number">
+        <button type="submit">Find Location</button>
+    </form>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+    {% if search_results %}
+        {% for result in search_results %}
+            <div class="appointment">
+                <h2>{{ result.location }}</h2>
+                <p>{{ result.address }}</p>
+                <form action="{{ url_for('confirm') }}" method="post">
+                    {% for slot in result.slots %}
+                        <input type="radio" name="slot" value="{{ slot }}" required> {{ slot }}<br>
+                    {% endfor %}
+                    <input type="hidden" name="location" value="{{ result.location }}">
+                    <button type="submit">Schedule Appointment</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        {% for appointment in appointments %}
+            <div class="appointment">
+                <h2>{{ appointment.location }}</h2>
+                <p>{{ appointment.address }}</p>
+                <form action="{{ url_for('confirm') }}" method="post">
+                    {% for slot in appointment.slots %}
+                        <input type="radio" name="slot" value="{{ slot }}" required> {{ slot }}<br>
+                    {% endfor %}
+                    <input type="hidden" name="location" value="{{ appointment.location }}">
+                    <button type="submit">Schedule Appointment</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>

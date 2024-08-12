@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinician Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        .dashboard-box {
+            background-color: #e0f7f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            position: relative;
+        }
+        h2 {
+            text-align: center;
+            color: #66bfbf;
+        }
+        .chart-container {
+            width: 80%;
+            margin: auto;
+            display: none;
+            justify-content: space-around;
+        }
+        .chart {
+            width: 45%;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .logout-button, .view-stats-button {
+            position: absolute;
+            top: 20px;
+            padding: 10px 20px;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .logout-button {
+            right: 20px;
+            background-color: #ff4d4d;
+        }
+        .logout-button:hover {
+            background-color: #e60000;
+        }
+        .view-stats-button {
+            right: 160px;
+            background-color: #007bff;
+        }
+        .view-stats-button:hover {
+            background-color: #0056b3;
+        }
+        .appointment-requests, .approved-appointments {
+            margin-top: 40px;
+        }
+        .appointment-requests h3, .approved-appointments h3 {
+            color: #007bff;
+        }
+        .appointment {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .appointment img {
+            max-width: 100px;
+            max-height: 100px;
+            margin-right: 10px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const viewStatsButton = document.querySelector('.view-stats-button');
+            const chartContainer = document.querySelector('.chart-container');
+
+            viewStatsButton.addEventListener('click', () => {
+                chartContainer.style.display = chartContainer.style.display === 'flex' ? 'none' : 'flex';
+            });
+
+            document.querySelectorAll('.approve-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', (event) => {
+                    const appointment = event.target.closest('.appointment');
+                    const approveCheckbox = appointment.querySelector('.approve-checkbox');
+                    const declineCheckbox = appointment.querySelector('.decline-checkbox');
+
+                    if (event.target === approveCheckbox && event.target.checked) {
+                        declineCheckbox.checked = false;
+                        document.querySelector('.approved-appointments').appendChild(appointment);
+                        saveApprovedAppointments();
+                    } else if (event.target === declineCheckbox && event.target.checked) {
+                        approveCheckbox.checked = false;
+                    }
+                });
+            });
+
+            loadApprovedAppointments();
+        });
+
+        function saveApprovedAppointments() {
+            const approvedAppointments = [];
+            document.querySelectorAll('.approved-appointments .appointment').forEach(appointment => {
+                approvedAppointments.push({
+                    name: appointment.querySelector('.name').innerText,
+                    email: appointment.querySelector('.email').innerText,
+                    healthcareNumber: appointment.querySelector('.healthcare-number').innerText,
+                    fileSrc: appointment.querySelector('img').src
+                });
+            });
+
+            fetch('/save_approved_appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(approvedAppointments)
+            });
+        }
+
+        function loadApprovedAppointments() {
+            fetch('/load_approved_appointments')
+                .then(response => response.json())
+                .then(data => {
+                    const approvedAppointmentsContainer = document.querySelector('.approved-appointments');
+                    data.forEach(appointment => {
+                        const appointmentElement = document.createElement('div');
+                        appointmentElement.classList.add('appointment');
+                        appointmentElement.innerHTML = `
+                            <div>
+                                <p class="name">${appointment.name}</p>
+                                <p class="email">${appointment.email}</p>
+                                <p class="healthcare-number">${appointment.healthcareNumber}</p>
+                            </div>
+                            <img src="${appointment.fileSrc}" alt="File">
+                        `;
+                        approvedAppointmentsContainer.appendChild(appointmentElement);
+                    });
+                });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-box">
+            <button class="logout-button" onclick="window.location.href='/'">Logout</button>
+            <button class="view-stats-button">View Clinic Stats</button>
+            <h2>Clinical Dashboard</h2>
+
+            <div class="appointment-requests">
+                <h3>Appointment Requests</h3>
+                {% if appointments %}
+                    {% for appointment in appointments %}
+                        <div class="appointment">
+                            <div>
+                                <p class="name">{{ appointment.name }}</p>
+                                <p class="email">{{ appointment.email }}</p>
+                                <p class="healthcare-number">{{ appointment.healthcare_number }}</p>
+                            </div>
+                            <img src="{{ appointment.file_src }}" alt="File">
+                            <div class="checkbox-container">
+                                <label><input type="checkbox" class="approve-checkbox"> Approve</label>
+                                <label><input type="checkbox" class="decline-checkbox"> Decline</label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No appointments found.</p>
+                {% endif %}
+            </div>
+
+            <div class="approved-appointments">
+                <h3>Approved Appointments</h3>
+                <!-- Approved appointments will be loaded here -->
+            </div>
+
+            <div class="chart-container">
+                <div class="chart">
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div class="chart">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pie Chart
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Data 1', 'Data 2', 'Data 3'],
+                datasets: [{
+                    label: 'Pie Chart',
+                    data: [10, 20, 30],
+                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe']
+                }]
+            }
+        });
+
+        // Bar Chart
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['January', 'February', 'March'],
+                datasets: [{
+                    label: 'Bar Chart',
+                    data: [15, 25, 35],
+                    backgroundColor: '#66bfbf'
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
