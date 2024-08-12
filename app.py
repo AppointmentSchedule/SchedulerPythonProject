@@ -1296,325 +1296,325 @@
 # if __name__ == '__main__':
 #     app.run(debug=True)
 #
-# from flask import Flask, render_template, request, jsonify
-# import logging
-# import os
-# import base64
-# from email.mime.text import MIMEText
-# import pickle
-# from google.auth.transport.requests import Request
-# from google_auth_oauthlib.flow import InstalledAppFlow
-# from googleapiclient.discovery import build
-# from werkzeug.utils import secure_filename
-# import pytesseract
-# from PIL import Image
-# from pdf2image import convert_from_path
-# import PyPDF2
-# import json
-# from search import perform_search
-#
-# app = Flask(__name__)
-# app.config['UPLOAD_FOLDER'] = 'uploads/'
-# app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'png', 'jpg', 'jpeg'}
-# app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB limit
-#
-# # Ensure the upload folder exists
-# if not os.path.exists(app.config['UPLOAD_FOLDER']):
-#     os.makedirs(app.config['UPLOAD_FOLDER'])
-#
-# SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-# POPPLER_PATH = '/opt/homebrew/bin/'  # Set your poppler path here
-# pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
-#
-# appointments_folder = 'appointments'
-#
-#
-# appointments = [
-#     {"location": "Oakville Trafalgar Hospital", "address": "3001 Hospital Gate, Oakville, ON L6M 0L8",
-#      "slots": ["11:45am June 1", "12:00pm June 1"], "coordinates": (43.4712, -79.7016)},
-#     {"location": "Ontario Diagnostic Centres X-Ray & Ultrasound",
-#      "address": "2315 Bristol Cir Suite#102, Oakville, ON L6H 6P8", "slots": ["1:00pm June 1", "2:00pm June 1"],
-#      "coordinates": (43.5123, -79.6857)},
-# ]
-#
-#
-# def allowed_file(filename):
-#     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-#
-#
-# def extract_text_from_image(image_path):
-#     try:
-#         text = pytesseract.image_to_string(Image.open(image_path))
-#         return text
-#     except Exception as e:
-#         print(f"Error extracting text from image: {e}")
-#         return ""
-#
-#
-# def extract_text_from_pdf(pdf_path):
-#     text = ""
-#     try:
-#         with open(pdf_path, "rb") as file:
-#             pdf = PyPDF2.PdfFileReader(file)
-#             for page in range(pdf.numPages):
-#                 text += pdf.getPage(page).extract_text()
-#         return text
-#     except Exception as e:
-#         print(f"Error extracting text from PDF: {e}")
-#         return ""
-#
-#
-# def authenticate_gmail():
-#     creds = None
-#     if os.path.exists('token.pickle'):
-#         with open('token.pickle', 'rb') as token:
-#             creds = pickle.load(token)
-#     if not creds or not creds.valid:
-#         if creds and creds.expired and creds.refresh_token:
-#             creds.refresh(Request())
-#         else:
-#             flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-#             creds = flow.run_local_server(port=0)
-#         with open('token.pickle', 'wb') as token:
-#             pickle.dump(creds, token)
-#     service = build('gmail', 'v1', credentials=creds)
-#     return service
-#
-#
-# def create_message(sender, to, subject, message_text):
-#     message = MIMEText(message_text)
-#     message['to'] = to
-#     message['from'] = sender
-#     message['subject'] = subject
-#     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
-#
-#
-# def send_message(service, user_id, message):
-#     try:
-#         message = (service.users().messages().send(userId=user_id, body=message).execute())
-#         print('Message Id: %s' % message['id'])
-#         return message
-#     except Exception as error:
-#         print('An error occurred: %s' % error)
-#         return None
-#
-#
-# @app.route('/')
-# def login():
-#     return render_template('login.html')
-#
-#
-# @app.route('/clinician_login')
-# def clinician_login():
-#     return render_template('clinician_login.html')
-#
-#
-# @app.route('/home')
-# def home():
-#     return render_template('home.html')
-#
-#
-# @app.route('/index')
-# def index():
-#     return render_template('index.html', appointments=appointments)
-#
-#
-# @app.route('/confirm', methods=['POST'])
-# def confirm():
-#     location = request.form['location']
-#     slot = request.form['slot']
-#     return render_template('confirm.html', location=location, slot=slot)
-#
-#
-# if not os.path.exists(appointments_folder):
-#     os.makedirs(appointments_folder)
-#
-# def save_appointment(appointment):
-#     file_path = os.path.join(appointments_folder, f"{appointment['name']}.json")
-#     with open(file_path, 'w') as f:
-#         json.dump(appointment, f)
-#
-# @app.route('/appointment_pending', methods=['POST'])
-# def appointment_pending():
-#     name = request.form['name']
-#     email = request.form['email']
-#     healthcare_number = request.form['healthcare_number']
-#     location = request.form.get('location', 'the hospital')
-#     # Here you would typically save the appointment details to a database
-#     appointment = {
-#         'name': name,
-#         'email': email,
-#         'healthcare_number': healthcare_number,
-#         'location': location,
-#         'file_src': 'Appointments'  # Add file_src if needed
-#     }
-#
-#     save_appointment(appointment)
-#
-#     return render_template('appointment_pending.html', hospital=location)
-#
-#
-# @app.route('/success', methods=['POST'])
-# def success():
-#     try:
-#         name = request.form['name']
-#         email = request.form['email']
-#         location = request.form['location']
-#         slot = request.form['slot']
-#
-#         service = authenticate_gmail()
-#         sender = "your-email@gmail.com"
-#         subject = "Appointment Confirmation"
-#         message_text = f"Hello {name},\n\nYour appointment is confirmed at {location} on {slot}.\n\nThank you!"
-#         message = create_message(sender, email, subject, message_text)
-#         send_message(service, "me", message)
-#
-#         return render_template('success.html', name=name, email=email, location=location, slot=slot)
-#     except Exception as e:
-#         logging.error(f"Error: {e}", exc_info=True)
-#         return "Internal Server Error", 500
-#
-#
-# @app.route('/search', methods=['POST'])
-# def search():
-#     appointment_type = request.form['appointment_type']
-#     city_province = request.form['city_province']
-#     priority_number = request.form['priority_number']
-#
-#     # Perform the search logic from another Python file
-#     search_results = perform_search(appointment_type, city_province)
-#     # Pass the search results to the template (if needed)
-#     return render_template('index.html', appointments=appointments, search_results=search_results)
-#
-#
-#
-# @app.route('/scan_document', methods=['POST'])
-# def scan_document():
-#     try:
-#         second_project_path = os.getenv('SECOND_PROJECT_PATH')
-#         if second_project_path:
-#             logging.debug(f"SECOND_PROJECT_PATH: {second_project_path}")
-#             command = f'python3 {second_project_path}'
-#             logging.debug(f"Executing command: {command}")
-#             result = os.system(command)
-#             if result != 0:
-#                 logging.error(f"Command execution failed with exit code: {result}")
-#                 return f"Error: Command execution failed with exit code: {result}", 500
-#             return "Scanning Document...", 200
-#         else:
-#             logging.error("Error: SECOND_PROJECT_PATH not set.")
-#             return "Error: SECOND_PROJECT_PATH not set.", 500
-#     except Exception as e:
-#         logging.error(f"An error occurred: {e}", exc_info=True)
-#         return "Internal Server Error", 500
-#
-#
-# def extract_information(file_path):
-#     text = ""
-#     _, file_extension = os.path.splitext(file_path)
-#
-#     if file_extension.lower() in ['.png', '.jpg', '.jpeg']:
-#         text = pytesseract.image_to_string(Image.open(file_path))
-#     elif file_extension.lower() == '.pdf':
-#         try:
-#             pages = convert_from_path(file_path, poppler_path=POPPLER_PATH)
-#             text = "\n".join(pytesseract.image_to_string(page) for page in pages)
-#         except Exception as e:
-#             print(f"Error processing PDF file: {e}")
-#             raise
-#     else:
-#         raise ValueError("Unsupported file type")
-#
-#     appointment_type = "General Checkup" if "General Checkup" in text else ""
-#     city_province = "Toronto, ON"
-#     priority_number = "1"
-#
-#     if "Checkup" in text:
-#         appointment_type = "General Checkup"
-#     if "Toronto" in text:
-#         city_province = "Toronto, ON"
-#     if "Priority" in text:
-#         priority_number = text.split("Priority")[1].split()[0]
-#
-#     return {
-#         'appointment_type': appointment_type,
-#         'city_province': city_province,
-#         'priority_number': priority_number
-#     }
-#
-#
-# @app.route('/upload_file', methods=['POST'])
-# def upload_file():
-#     if 'file' not in request.files:
-#         return jsonify({'error': 'No file part'}), 400
-#
-#     file = request.files['file']
-#     if file.filename == '':
-#         return jsonify({'error': 'No selected file'}), 400
-#
-#     if file and allowed_file(file.filename):
-#         filename = secure_filename(file.filename)
-#         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-#         file.save(file_path)
-#
-#         try:
-#             extracted_info = extract_information(file_path)
-#             appointments.append({
-#                 'name': extracted_info.get('name', 'Unknown'),
-#                 'email': extracted_info.get('email', 'Unknown'),
-#                 'healthcare_number': extracted_info.get('healthcare_number', 'Unknown'),
-#                 'file_src': file_path
-#             })
-#         except Exception as e:
-#             return jsonify({'error': f'Error extracting information: {e}'}), 500
-#
-#         return jsonify({
-#             'message': 'File uploaded successfully',
-#             'appointment_type': extracted_info['appointment_type'],
-#             'city_province': extracted_info['city_province'],
-#             'priority_number': extracted_info['priority_number']
-#         }), 200
-#     else:
-#         return jsonify({'error': 'File upload failed'}), 500
-#
-#
-# APPROVED_APPOINTMENTS_FILE = 'approved_appointments.json'
-#
-#
-# def save_approved_appointments(appointments):
-#     with open(APPROVED_APPOINTMENTS_FILE, 'w') as f:
-#         json.dump(appointments, f)
-#
-#
-# def load_approved_appointments():
-#     if not os.path.exists(APPROVED_APPOINTMENTS_FILE):
-#         return []
-#     with open(APPROVED_APPOINTMENTS_FILE, 'r') as f:
-#         return json.load(f)
-#
-#
-# @app.route('/dashboard')
-# def dashboard():
-#     approved_appointments = load_approved_appointments()
-#     return render_template('dashboard.html', approved_appointments=approved_appointments)
-#
-#
-# @app.route('/save_approved_appointments', methods=['POST'])
-# def save_approved_appointments_route():
-#     approved_appointments = request.json
-#     save_approved_appointments(approved_appointments)
-#     return '', 204
-#
-#
-# @app.route('/load_approved_appointments', methods=['GET'])
-# def load_approved_appointments_route():
-#     approved_appointments = load_approved_appointments()
-#     return jsonify(approved_appointments)
-#
-#
-#
-# if __name__ == '__main__':
-#     app.run(debug=True)
+from flask import Flask, render_template, request, jsonify
+import logging
+import os
+import base64
+from email.mime.text import MIMEText
+import pickle
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from werkzeug.utils import secure_filename
+import pytesseract
+from PIL import Image
+from pdf2image import convert_from_path
+import PyPDF2
+import json
+from search import perform_search
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'png', 'jpg', 'jpeg'}
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB limit
+
+# Ensure the upload folder exists
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+POPPLER_PATH = '/opt/homebrew/bin/'  # Set your poppler path here
+pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
+
+appointments_folder = 'appointments'
+
+
+appointments = [
+    {"location": "Oakville Trafalgar Hospital", "address": "3001 Hospital Gate, Oakville, ON L6M 0L8",
+     "slots": ["11:45am June 1", "12:00pm June 1"], "coordinates": (43.4712, -79.7016)},
+    {"location": "Ontario Diagnostic Centres X-Ray & Ultrasound",
+     "address": "2315 Bristol Cir Suite#102, Oakville, ON L6H 6P8", "slots": ["1:00pm June 1", "2:00pm June 1"],
+     "coordinates": (43.5123, -79.6857)},
+]
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+
+def extract_text_from_image(image_path):
+    try:
+        text = pytesseract.image_to_string(Image.open(image_path))
+        return text
+    except Exception as e:
+        print(f"Error extracting text from image: {e}")
+        return ""
+
+
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    try:
+        with open(pdf_path, "rb") as file:
+            pdf = PyPDF2.PdfFileReader(file)
+            for page in range(pdf.numPages):
+                text += pdf.getPage(page).extract_text()
+        return text
+    except Exception as e:
+        print(f"Error extracting text from PDF: {e}")
+        return ""
+
+
+def authenticate_gmail():
+    creds = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    service = build('gmail', 'v1', credentials=creds)
+    return service
+
+
+def create_message(sender, to, subject, message_text):
+    message = MIMEText(message_text)
+    message['to'] = to
+    message['from'] = sender
+    message['subject'] = subject
+    return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
+
+
+def send_message(service, user_id, message):
+    try:
+        message = (service.users().messages().send(userId=user_id, body=message).execute())
+        print('Message Id: %s' % message['id'])
+        return message
+    except Exception as error:
+        print('An error occurred: %s' % error)
+        return None
+
+
+@app.route('/')
+def login():
+    return render_template('login.html')
+
+
+@app.route('/clinician_login')
+def clinician_login():
+    return render_template('clinician_login.html')
+
+
+@app.route('/home')
+def home():
+    return render_template('home.html')
+
+
+@app.route('/index')
+def index():
+    return render_template('index.html', appointments=appointments)
+
+
+@app.route('/confirm', methods=['POST'])
+def confirm():
+    location = request.form['location']
+    slot = request.form['slot']
+    return render_template('confirm.html', location=location, slot=slot)
+
+
+if not os.path.exists(appointments_folder):
+    os.makedirs(appointments_folder)
+
+def save_appointment(appointment):
+    file_path = os.path.join(appointments_folder, f"{appointment['name']}.json")
+    with open(file_path, 'w') as f:
+        json.dump(appointment, f)
+
+@app.route('/appointment_pending', methods=['POST'])
+def appointment_pending():
+    name = request.form['name']
+    email = request.form['email']
+    healthcare_number = request.form['healthcare_number']
+    location = request.form.get('location', 'the hospital')
+    # Here you would typically save the appointment details to a database
+    appointment = {
+        'name': name,
+        'email': email,
+        'healthcare_number': healthcare_number,
+        'location': location,
+        'file_src': 'Appointments'  # Add file_src if needed
+    }
+
+    save_appointment(appointment)
+
+    return render_template('appointment_pending.html', hospital=location)
+
+
+@app.route('/success', methods=['POST'])
+def success():
+    try:
+        name = request.form['name']
+        email = request.form['email']
+        location = request.form['location']
+        slot = request.form['slot']
+
+        service = authenticate_gmail()
+        sender = "your-email@gmail.com"
+        subject = "Appointment Confirmation"
+        message_text = f"Hello {name},\n\nYour appointment is confirmed at {location} on {slot}.\n\nThank you!"
+        message = create_message(sender, email, subject, message_text)
+        send_message(service, "me", message)
+
+        return render_template('success.html', name=name, email=email, location=location, slot=slot)
+    except Exception as e:
+        logging.error(f"Error: {e}", exc_info=True)
+        return "Internal Server Error", 500
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    appointment_type = request.form['appointment_type']
+    city_province = request.form['city_province']
+    priority_number = request.form['priority_number']
+
+    # Perform the search logic from another Python file
+    search_results = perform_search(appointment_type, city_province)
+    # Pass the search results to the template (if needed)
+    return render_template('index.html', appointments=appointments, search_results=search_results)
+
+
+
+@app.route('/scan_document', methods=['POST'])
+def scan_document():
+    try:
+        second_project_path = os.getenv('SECOND_PROJECT_PATH')
+        if second_project_path:
+            logging.debug(f"SECOND_PROJECT_PATH: {second_project_path}")
+            command = f'python3 {second_project_path}'
+            logging.debug(f"Executing command: {command}")
+            result = os.system(command)
+            if result != 0:
+                logging.error(f"Command execution failed with exit code: {result}")
+                return f"Error: Command execution failed with exit code: {result}", 500
+            return "Scanning Document...", 200
+        else:
+            logging.error("Error: SECOND_PROJECT_PATH not set.")
+            return "Error: SECOND_PROJECT_PATH not set.", 500
+    except Exception as e:
+        logging.error(f"An error occurred: {e}", exc_info=True)
+        return "Internal Server Error", 500
+
+
+def extract_information(file_path):
+    text = ""
+    _, file_extension = os.path.splitext(file_path)
+
+    if file_extension.lower() in ['.png', '.jpg', '.jpeg']:
+        text = pytesseract.image_to_string(Image.open(file_path))
+    elif file_extension.lower() == '.pdf':
+        try:
+            pages = convert_from_path(file_path, poppler_path=POPPLER_PATH)
+            text = "\n".join(pytesseract.image_to_string(page) for page in pages)
+        except Exception as e:
+            print(f"Error processing PDF file: {e}")
+            raise
+    else:
+        raise ValueError("Unsupported file type")
+
+    appointment_type = "General Checkup" if "General Checkup" in text else ""
+    city_province = "Toronto, ON"
+    priority_number = "1"
+
+    if "Checkup" in text:
+        appointment_type = "General Checkup"
+    if "Toronto" in text:
+        city_province = "Toronto, ON"
+    if "Priority" in text:
+        priority_number = text.split("Priority")[1].split()[0]
+
+    return {
+        'appointment_type': appointment_type,
+        'city_province': city_province,
+        'priority_number': priority_number
+    }
+
+
+@app.route('/upload_file', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        try:
+            extracted_info = extract_information(file_path)
+            appointments.append({
+                'name': extracted_info.get('name', 'Unknown'),
+                'email': extracted_info.get('email', 'Unknown'),
+                'healthcare_number': extracted_info.get('healthcare_number', 'Unknown'),
+                'file_src': file_path
+            })
+        except Exception as e:
+            return jsonify({'error': f'Error extracting information: {e}'}), 500
+
+        return jsonify({
+            'message': 'File uploaded successfully',
+            'appointment_type': extracted_info['appointment_type'],
+            'city_province': extracted_info['city_province'],
+            'priority_number': extracted_info['priority_number']
+        }), 200
+    else:
+        return jsonify({'error': 'File upload failed'}), 500
+
+
+APPROVED_APPOINTMENTS_FILE = 'approved_appointments.json'
+
+
+def save_approved_appointments(appointments):
+    with open(APPROVED_APPOINTMENTS_FILE, 'w') as f:
+        json.dump(appointments, f)
+
+
+def load_approved_appointments():
+    if not os.path.exists(APPROVED_APPOINTMENTS_FILE):
+        return []
+    with open(APPROVED_APPOINTMENTS_FILE, 'r') as f:
+        return json.load(f)
+
+
+@app.route('/dashboard')
+def dashboard():
+    approved_appointments = load_approved_appointments()
+    return render_template('dashboard.html', approved_appointments=approved_appointments)
+
+
+@app.route('/save_approved_appointments', methods=['POST'])
+def save_approved_appointments_route():
+    approved_appointments = request.json
+    save_approved_appointments(approved_appointments)
+    return '', 204
+
+
+@app.route('/load_approved_appointments', methods=['GET'])
+def load_approved_appointments_route():
+    approved_appointments = load_approved_appointments()
+    return jsonify(approved_appointments)
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 
